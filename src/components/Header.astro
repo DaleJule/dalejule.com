@@ -16,11 +16,6 @@ const platforms = [
     icon: '/icons/podbbang.svg',
   },
   {
-    name: '오디오클립',
-    url: 'https://audioclip.naver.com/channels/9977',
-    icon: '/icons/audioclip.svg',
-  },
-  {
     name: 'RSS',
     url: 'https://anchor.fm/s/9cd202e8/podcast/rss',
     icon: '/icons/rss.svg',
@@ -30,12 +25,12 @@ const platforms = [
 
 <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
   <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-    <!-- 로고: #C04E00 on white = 4.82:1 (WCAG AA) -->
     <a
       href="/"
-      class="text-xl font-black text-[#C04E00] tracking-tight hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C04E00] focus-visible:ring-offset-2 focus-visible:rounded"
+      class="text-xl font-black text-[#FF6600] tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2 focus-visible:rounded"
     >
       달레줄레
+      <span class="text-xs font-medium text-gray-400 tracking-widest">DaleJule</span>
     </a>
     <nav aria-label="플랫폼 링크" class="flex items-center gap-3">
       {platforms.map(({ name, url, icon }) => (

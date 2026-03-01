@@ -7,15 +7,6 @@ interface Props {
 
 const { meta } = Astro.props;
 
-const platforms = [
-  { name: 'Apple Podcasts', url: 'https://dales.link/applepodcast' },
-  {
-    name: 'YouTube',
-    url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W',
-  },
-  { name: '팟빵', url: 'https://www.podbbang.com/channels/1784466/' },
-  { name: '오디오클립', url: 'https://audioclip.naver.com/channels/9977' },
-];
 ---
 
 <section class="bg-[#FF6600] text-white">
@@ -39,17 +30,5 @@ const platforms = [
       <p class="text-white/90 text-lg max-w-md">{meta.description}</p>
     </div>
 
-    <div class="flex flex-wrap gap-2 justify-center mt-2">
-      {platforms.map(({ name, url }) => (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="px-4 py-2 border-2 border-white/70 text-white text-sm font-semibold rounded-full hover:bg-white hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#FF6600]"
-        >
-          {name}
-        </a>
-      ))}
-    </div>
   </div>
 </section>
