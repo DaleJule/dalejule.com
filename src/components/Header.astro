@@ -1,0 +1,55 @@
+---
+const platforms = [
+  {
+    name: 'Apple Podcasts',
+    url: 'https://dales.link/applepodcast',
+    icon: '/icons/apple-podcasts.svg',
+  },
+  {
+    name: 'YouTube',
+    url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W',
+    icon: '/icons/youtube.svg',
+  },
+  {
+    name: '팟빵',
+    url: 'https://www.podbbang.com/channels/1784466/',
+    icon: '/icons/podbbang.svg',
+  },
+  {
+    name: '오디오클립',
+    url: 'https://audioclip.naver.com/channels/9977',
+    icon: '/icons/audioclip.svg',
+  },
+  {
+    name: 'RSS',
+    url: 'https://anchor.fm/s/9cd202e8/podcast/rss',
+    icon: '/icons/rss.svg',
+  },
+];
+---
+
+<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- 로고: #C04E00 on white = 4.82:1 (WCAG AA) -->
+    <a
+      href="/"
+      class="text-xl font-black text-[#C04E00] tracking-tight hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C04E00] focus-visible:ring-offset-2 focus-visible:rounded"
+    >
+      달레줄레
+    </a>
+    <nav aria-label="플랫폼 링크" class="flex items-center gap-3">
+      {platforms.map(({ name, url, icon }) => (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={name}
+          class="w-7 h-7 text-gray-500 hover:text-[#FF6600] transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C04E00] focus-visible:ring-offset-2 focus-visible:rounded"
+        >
+          <!-- alt="" — 부모 <a>의 aria-label이 레이블을 제공 -->
+          <img src={icon} alt="" width="24" height="24" class="w-6 h-6" />
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>

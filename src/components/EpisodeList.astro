@@ -1,0 +1,25 @@
+---
+import type { Episode } from '../lib/types';
+import EpisodeCard from './EpisodeCard.astro';
+
+interface Props {
+  episodes: Episode[];
+}
+
+const { episodes } = Astro.props;
+---
+
+<section class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <!-- #C04E00 on white = 4.82:1 (WCAG AA) -->
+    <h2 class="text-xl font-black text-gray-900">
+      에피소드 · <span class="text-[#C04E00]">{episodes.length}개</span>
+    </h2>
+  </div>
+
+  <ol class="list-none" reversed>
+    {episodes.map((episode) => (
+      <EpisodeCard episode={episode} />
+    ))}
+  </ol>
+</section>

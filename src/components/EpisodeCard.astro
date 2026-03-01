@@ -1,0 +1,61 @@
+---
+import type { Episode } from '../lib/types';
+
+interface Props {
+  episode: Episode;
+}
+
+const { episode } = Astro.props;
+
+const formattedDate = episode.publishDate
+  ? new Date(episode.publishDate).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  : '';
+---
+
+<li class="flex gap-4 py-5 border-b border-gray-100 last:border-0">
+  <!-- 에피소드 번호 배지: text-gray-900 on #FF6600 = ~6.5:1 (WCAG AA) -->
+  <div class="flex-shrink-0 mt-1" aria-hidden="true">
+    <span class="w-10 h-10 rounded-full bg-[#FF6600] text-gray-900 text-sm font-black flex items-center justify-center">
+      {episode.episodeNumber}
+    </span>
+  </div>
+
+  <!-- 콘텐츠 -->
+  <div class="flex-1 min-w-0">
+    <h3 class="font-bold text-gray-900 leading-snug mb-1">
+      <a href={`/episodes/${episode.episodeNumber}`} class="hover:text-[#FF6600] transition-colors">
+        {episode.title}
+      </a>
+    </h3>
+    {episode.description && (
+      <p class="text-gray-500 text-sm line-clamp-2 mb-2">
+        {episode.description}
+      </p>
+    )}
+    <!-- text-gray-500 on white = 4.63:1 (WCAG AA) -->
+    <div class="flex items-center gap-2 text-xs text-gray-500">
+      {formattedDate && <span>{formattedDate}</span>}
+      {episode.duration && formattedDate && <span aria-hidden="true">·</span>}
+      {episode.duration && <span>{episode.duration}</span>}
+    </div>
+  </div>
+
+  <!-- 듣기 버튼: #C04E00 on white = 4.82:1 (WCAG AA) -->
+  {episode.listenUrl && (
+    <div class="flex-shrink-0 flex items-start pt-1">
+      <a
+        href={episode.listenUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${episode.title} 듣기`}
+        class="px-3 py-1.5 border border-[#C04E00] text-[#C04E00] text-xs font-bold rounded-full hover:bg-[#FF6600] hover:border-[#FF6600] hover:text-white transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C04E00] focus-visible:ring-offset-1"
+      >
+        ▶ 듣기
+      </a>
+    </div>
+  )}
+</li>

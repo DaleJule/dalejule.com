@@ -1,0 +1,17 @@
+---
+import { getPodcastData } from '../lib/rss';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import EpisodeList from '../components/EpisodeList.astro';
+
+const { meta, episodes } = await getPodcastData();
+---
+
+<Layout title={meta.title} description={meta.description} imageUrl={meta.imageUrl}>
+  <Header />
+  <main id="main-content">
+    <Hero meta={meta} />
+    <EpisodeList episodes={episodes} />
+  </main>
+</Layout>

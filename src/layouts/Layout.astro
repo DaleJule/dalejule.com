@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  canonicalUrl?: string;
+}
+
+const { title, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/icon.svg', canonicalUrl } = Astro.props;
+const siteUrl = 'https://dalejule.com';
+const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <link rel="canonical" href={resolvedCanonicalUrl} />
+
+    <!-- OG -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={resolvedCanonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}${imageUrl}`} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}${imageUrl}`} />
+
+    <!-- Pretendard Font -->
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#FF6600" />
+  </head>
+  <body class="bg-white text-gray-900 antialiased">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#FF6600] focus:text-white focus:rounded focus:font-bold"
+    >
+      콘텐츠 바로가기
+    </a>
+    <slot />
+  </body>
+</html>

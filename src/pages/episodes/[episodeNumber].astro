@@ -1,0 +1,91 @@
+---
+import { getPodcastData } from '../../lib/rss';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import type { Episode, PodcastMeta } from '../../lib/types';
+export async function getStaticPaths() {
+  const { meta, episodes } = await getPodcastData();
+  return episodes.map((episode) => ({
+    params: { episodeNumber: String(episode.episodeNumber) },
+    props: { episode, meta },
+  }));
+}
+
+interface Props {
+  episode: Episode;
+  meta: PodcastMeta;
+}
+
+const { episode, meta } = Astro.props;
+
+const siteUrl = 'https://dalejule.com';
+const canonicalUrl = `${siteUrl}/episodes/${episode.episodeNumber}`;
+const pageTitle = `${episode.title} — ${meta.title}`;
+const pageDescription = episode.description.slice(0, 160);
+
+const descriptionHtml = episode.descriptionHtml ?? '';
+
+const formattedDate = episode.publishDate
+  ? new Date(episode.publishDate).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  : '';
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  imageUrl={meta.imageUrl.startsWith('http') ? meta.imageUrl : meta.imageUrl}
+  canonicalUrl={canonicalUrl}
+>
+  <Header />
+  <main id="main-content" class="max-w-2xl mx-auto px-4 py-10">
+    <!-- 뒤로가기 -->
+    <a
+      href="/"
+      class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-[#FF6600] transition-colors mb-8"
+    >
+      ← 모든 에피소드
+    </a>
+
+    <!-- 에피소드 헤더 -->
+    <div class="flex items-start gap-4 mb-6">
+      <div class="flex-shrink-0 mt-1" aria-hidden="true">
+        <span
+          class="w-12 h-12 rounded-full bg-[#FF6600] text-gray-900 text-base font-black flex items-center justify-center"
+        >
+          {episode.episodeNumber}
+        </span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-2">
+          {episode.title}
+        </h1>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          {formattedDate && <span>{formattedDate}</span>}
+          {episode.duration && formattedDate && <span aria-hidden="true">·</span>}
+          {episode.duration && <span>{episode.duration}</span>}
+        </div>
+      </div>
+    </div>
+
+    <!-- 듣기 버튼 -->
+    {episode.listenUrl && (
+      <a
+        href={episode.listenUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-[#FF6600] hover:bg-[#E55A00] text-white font-bold rounded-full transition-colors mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2"
+      >
+        ▶ 듣기
+      </a>
+    )}
+
+    <!-- 에피소드 설명 -->
+    {descriptionHtml && (
+      <div class="prose max-w-none" set:html={descriptionHtml} />
+    )}
+  </main>
+</Layout>

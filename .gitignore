@@ -1,0 +1,16 @@
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# Astro cache
+.astro/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store

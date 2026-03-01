@@ -1,0 +1,55 @@
+---
+import type { PodcastMeta } from '../lib/types';
+
+interface Props {
+  meta: PodcastMeta;
+}
+
+const { meta } = Astro.props;
+
+const platforms = [
+  { name: 'Apple Podcasts', url: 'https://dales.link/applepodcast' },
+  {
+    name: 'YouTube',
+    url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W',
+  },
+  { name: '팟빵', url: 'https://www.podbbang.com/channels/1784466/' },
+  { name: '오디오클립', url: 'https://audioclip.naver.com/channels/9977' },
+];
+---
+
+<section class="bg-[#FF6600] text-white">
+  <div class="max-w-4xl mx-auto px-4 py-16 flex flex-col items-center text-center gap-6">
+    <div class="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center p-2">
+      <!-- fetchpriority="high": above-fold critical image -->
+      <img
+        src="/icon.svg"
+        alt="달레줄레 로고"
+        width="128"
+        height="128"
+        fetchpriority="high"
+        class="w-full h-full"
+        style="filter: brightness(0) invert(1);"
+      />
+    </div>
+
+    <div>
+      <!-- text-4xl font-black = 36px bold → WCAG 대형 텍스트, 흰색 on #FF6600 = 2.94:1 (borderline) -->
+      <h1 class="text-4xl font-black tracking-tight mb-2">{meta.title}</h1>
+      <p class="text-white/90 text-lg max-w-md">{meta.description}</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2 justify-center mt-2">
+      {platforms.map(({ name, url }) => (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-4 py-2 border-2 border-white/70 text-white text-sm font-semibold rounded-full hover:bg-white hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#FF6600]"
+        >
+          {name}
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
