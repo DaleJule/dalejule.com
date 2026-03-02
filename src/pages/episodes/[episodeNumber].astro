@@ -25,6 +25,13 @@ const pageDescription = episode.description.slice(0, 160);
 
 const descriptionHtml = episode.descriptionHtml ?? '';
 
+const platforms = [
+  { name: 'Apple', url: 'https://dales.link/applepodcast', icon: '/icons/apple-podcasts.svg' },
+  { name: 'Spotify', url: 'https://open.spotify.com/show/0b6RO7JD2DgGxVGRHN701H', icon: '/icons/spotify.svg' },
+  { name: 'YouTube', url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W', icon: '/icons/youtube.svg' },
+  { name: '팟빵', url: 'https://www.podbbang.com/channels/1784466/', icon: '/icons/podbbang.svg' },
+].filter(({ url }) => url);
+
 const formattedDate = episode.publishDate
   ? new Date(episode.publishDate).toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -71,17 +78,20 @@ const formattedDate = episode.publishDate
       </div>
     </div>
 
-    <!-- 듣기 버튼 -->
-    {episode.listenUrl && (
-      <a
-        href={episode.listenUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-[#FF6600] hover:bg-[#E55A00] text-white font-bold rounded-full transition-colors mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2"
-      >
-        ▶ 듣기
-      </a>
-    )}
+    <!-- 플랫폼 듣기 버튼 -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      {platforms.map(({ name, url, icon }) => (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 text-sm font-semibold rounded-full hover:border-[#FF6600] hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2"
+        >
+          <img src={icon} alt="" width="16" height="16" class="w-4 h-4" />
+          {name}
+        </a>
+      ))}
+    </div>
 
     <!-- 에피소드 설명 -->
     {descriptionHtml && (
