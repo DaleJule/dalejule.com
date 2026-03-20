@@ -9,7 +9,7 @@ interface Props {
   canonicalUrl?: string;
 }
 
-const { title, ogTitle, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/icon.svg', canonicalUrl } = Astro.props;
+const { title, ogTitle, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/og-image.png', canonicalUrl } = Astro.props;
 const siteUrl = 'https://dalejule.com';
 const siteName = '달레줄레 팟캐스트';
 const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
