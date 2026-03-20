@@ -115,6 +115,7 @@ export async function getPodcastData(): Promise<{ meta: PodcastMeta; episodes: E
     ignoreAttributes: false,
     attributeNamePrefix: '@_',
     cdataPropName: '__cdata',
+    processEntities: false,
   });
 
   const result = parser.parse(xml);
