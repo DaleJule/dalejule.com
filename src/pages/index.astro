@@ -9,7 +9,7 @@ import Footer from '../components/Footer.astro';
 const { meta, episodes } = await getPodcastData();
 ---
 
-<Layout title="달레줄레 팟캐스트" description={meta.description} imageUrl={meta.imageUrl}>
+<Layout title="달레줄레 팟캐스트" description={meta.description}>
   <Header />
   <main id="main-content">
     <Hero meta={meta} />

@@ -3,21 +3,20 @@ import { getPodcastData } from '../../lib/rss';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Giscus from '../../components/Giscus.astro';
-import type { Episode, PodcastMeta } from '../../lib/types';
+import type { Episode } from '../../lib/types';
 export async function getStaticPaths() {
   const { meta, episodes } = await getPodcastData();
   return episodes.map((episode) => ({
     params: { episodeNumber: String(episode.episodeNumber) },
-    props: { episode, meta },
+    props: { episode },
   }));
 }
 
 interface Props {
   episode: Episode;
-  meta: PodcastMeta;
 }
 
-const { episode, meta } = Astro.props;
+const { episode } = Astro.props;
 
 const siteUrl = 'https://dalejule.com';
 const canonicalUrl = `${siteUrl}/episodes/${episode.episodeNumber}`;
@@ -47,7 +46,6 @@ const formattedDate = episode.publishDate
   title={pageTitle}
   ogTitle={episodeTitle}
   description={pageDescription}
-  imageUrl={meta.imageUrl}
   canonicalUrl={canonicalUrl}
 >
   <Header />
