@@ -22,7 +22,7 @@ const { episode, meta } = Astro.props;
 const siteUrl = 'https://dalejule.com';
 const canonicalUrl = `${siteUrl}/episodes/${episode.episodeNumber}`;
 const episodeTitle = `EP.${episode.episodeNumber} ${episode.title}`;
-const pageTitle = `${episodeTitle} — ${meta.title}`;
+const pageTitle = `${episodeTitle} — 달레줄레 팟캐스트`;
 const pageDescription = episode.description.slice(0, 160);
 
 const descriptionHtml = episode.descriptionHtml ?? '';

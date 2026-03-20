@@ -11,7 +11,7 @@ interface Props {
 
 const { title, ogTitle, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/icon.svg', canonicalUrl } = Astro.props;
 const siteUrl = 'https://dalejule.com';
-const siteName = '달레줄레';
+const siteName = '달레줄레 팟캐스트';
 const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
 const resolvedOgTitle = ogTitle ?? title;
 const resolvedImageUrl = imageUrl.startsWith('http') ? imageUrl : `${siteUrl}${imageUrl}`;
