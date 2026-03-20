@@ -3,14 +3,18 @@ import '../styles/global.css';
 
 interface Props {
   title: string;
+  ogTitle?: string;
   description?: string;
   imageUrl?: string;
   canonicalUrl?: string;
 }
 
-const { title, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/icon.svg', canonicalUrl } = Astro.props;
+const { title, ogTitle, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/icon.svg', canonicalUrl } = Astro.props;
 const siteUrl = 'https://dalejule.com';
+const siteName = '달레줄레';
 const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
+const resolvedOgTitle = ogTitle ?? title;
+const resolvedImageUrl = imageUrl.startsWith('http') ? imageUrl : `${siteUrl}${imageUrl}`;
 ---
 
 <!doctype html>
@@ -25,16 +29,19 @@ const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
 
     <!-- OG -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={resolvedCanonicalUrl} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={resolvedOgTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${siteUrl}${imageUrl}`} />
+    <meta property="og:image" content={resolvedImageUrl} />
+    <meta property="og:image:alt" content={resolvedOgTitle} />
+    <meta property="og:locale" content="ko_KR" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={resolvedOgTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${siteUrl}${imageUrl}`} />
+    <meta name="twitter:image" content={resolvedImageUrl} />
 
     <!-- Pretendard Font -->
     <link

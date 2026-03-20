@@ -2,6 +2,7 @@
 import { getPodcastData } from '../../lib/rss';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import Giscus from '../../components/Giscus.astro';
 import type { Episode, PodcastMeta } from '../../lib/types';
 export async function getStaticPaths() {
   const { meta, episodes } = await getPodcastData();
@@ -20,7 +21,8 @@ const { episode, meta } = Astro.props;
 
 const siteUrl = 'https://dalejule.com';
 const canonicalUrl = `${siteUrl}/episodes/${episode.episodeNumber}`;
-const pageTitle = `${episode.title} — ${meta.title}`;
+const episodeTitle = `EP.${episode.episodeNumber} ${episode.title}`;
+const pageTitle = `${episodeTitle} — ${meta.title}`;
 const pageDescription = episode.description.slice(0, 160);
 
 const descriptionHtml = episode.descriptionHtml ?? '';
@@ -43,8 +45,9 @@ const formattedDate = episode.publishDate
 
 <Layout
   title={pageTitle}
+  ogTitle={episodeTitle}
   description={pageDescription}
-  imageUrl={meta.imageUrl.startsWith('http') ? meta.imageUrl : meta.imageUrl}
+  imageUrl={meta.imageUrl}
   canonicalUrl={canonicalUrl}
 >
   <Header />
@@ -97,5 +100,7 @@ const formattedDate = episode.publishDate
     {descriptionHtml && (
       <div class="prose max-w-none" set:html={descriptionHtml} />
     )}
+
+    <Giscus />
   </main>
 </Layout>
