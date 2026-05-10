@@ -2,7 +2,7 @@ name: Rebuild site for new RSS episodes
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 16 * * *'
   workflow_dispatch:
 
 jobs:
