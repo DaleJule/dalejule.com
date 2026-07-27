@@ -7,9 +7,17 @@ interface Props {
   description?: string;
   imageUrl?: string;
   canonicalUrl?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
 }
 
-const { title, ogTitle, description = '프로그래머가 들려주는 프로그래밍 팟케스트', imageUrl = '/og-image.png', canonicalUrl } = Astro.props;
+const {
+  title,
+  ogTitle,
+  description = '프로그래머가 들려주는 프로그래밍 팟케스트',
+  imageUrl = '/og-image.png',
+  canonicalUrl,
+  twitterCard = 'summary_large_image',
+} = Astro.props;
 const siteUrl = 'https://dalejule.com';
 const siteName = '달레줄레 팟캐스트';
 const resolvedCanonicalUrl = canonicalUrl ?? siteUrl;
@@ -38,7 +46,7 @@ const resolvedImageUrl = imageUrl.startsWith('http') ? imageUrl : `${siteUrl}${i
     <meta property="og:locale" content="ko_KR" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={resolvedOgTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={resolvedImageUrl} />

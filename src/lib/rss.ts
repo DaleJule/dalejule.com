@@ -152,6 +152,7 @@ async function fetchPodcastData(): Promise<PodcastData> {
       descriptionHtml: processDescriptionHtml(rawDesc),
       publishDate: toText(item?.pubDate),
       duration: formatDuration(item?.['itunes:duration'] || ''),
+      imageUrl: toText(item?.['itunes:image']?.['@_href']) || meta.imageUrl,
       audioUrl: item?.enclosure?.['@_url'] || '',
       listenUrl: toText(item?.link) || item?.enclosure?.['@_url'] || '',
     };

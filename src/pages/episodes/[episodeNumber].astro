@@ -1,4 +1,5 @@
 ---
+import { Image, getImage } from 'astro:assets';
 import { getPodcastData } from '../../lib/rss';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
@@ -26,6 +27,11 @@ const pageDescription = episode.description.slice(0, 160);
 
 const descriptionHtml = episode.descriptionHtml ?? '';
 
+// 에피소드 아트를 공유 썸네일로 쓴다. 원본은 최대 2MB라 빌드 시 자체 호스팅 사본을 만든다
+const ogImage = episode.imageUrl
+  ? await getImage({ src: episode.imageUrl, width: 1200, height: 1200, format: 'jpg' })
+  : undefined;
+
 const platforms = [
   { name: 'Apple', url: 'https://dales.link/applepodcast', icon: '/icons/apple-podcasts.svg' },
   { name: 'Spotify', url: 'https://open.spotify.com/show/0b6RO7JD2DgGxVGRHN701H', icon: '/icons/spotify.svg' },
@@ -47,6 +53,8 @@ const formattedDate = episode.publishDate
   ogTitle={episodeTitle}
   description={pageDescription}
   canonicalUrl={canonicalUrl}
+  imageUrl={ogImage?.src}
+  twitterCard={ogImage ? 'summary' : undefined}
 >
   <Header />
   <main id="main-content" class="max-w-2xl mx-auto px-4 py-10">
@@ -60,14 +68,21 @@ const formattedDate = episode.publishDate
 
     <!-- 에피소드 헤더 -->
     <div class="flex items-start gap-4 mb-6">
-      <div class="flex-shrink-0 mt-1" aria-hidden="true">
-        <span
-          class="w-12 h-12 rounded-full bg-[#FF6600] text-gray-900 text-base font-black flex items-center justify-center"
-        >
-          {episode.episodeNumber}
-        </span>
-      </div>
+      {episode.imageUrl && (
+        <!-- fetchpriority="high": above-fold critical image -->
+        <Image
+          src={episode.imageUrl}
+          alt=""
+          width={224}
+          height={224}
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+          class="flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl object-cover bg-gray-100"
+        />
+      )}
       <div class="flex-1 min-w-0">
+        <p class="text-sm font-black text-[#FF6600] mb-1">EP.{episode.episodeNumber}</p>
         <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-2">
           {episode.title}
         </h1>

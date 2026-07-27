@@ -13,6 +13,7 @@ export interface Episode {
   descriptionHtml: string;
   publishDate: string;
   duration: string;
+  imageUrl: string;
   audioUrl: string;
   listenUrl: string;
 }
