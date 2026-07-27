@@ -104,7 +104,17 @@ function processDescriptionHtml(raw: unknown): string {
   return parts.join('');
 }
 
-export async function getPodcastData(): Promise<{ meta: PodcastMeta; episodes: Episode[] }> {
+type PodcastData = { meta: PodcastMeta; episodes: Episode[] };
+
+// 빌드 중 페이지마다 RSS를 다시 받으면 서로 다른 스냅샷을 보게 되므로 한 번만 받는다
+let podcastData: Promise<PodcastData> | null = null;
+
+export function getPodcastData(): Promise<PodcastData> {
+  podcastData ??= fetchPodcastData();
+  return podcastData;
+}
+
+async function fetchPodcastData(): Promise<PodcastData> {
   const response = await fetch(RSS_URL);
   if (!response.ok) {
     throw new Error(`Failed to fetch RSS feed: ${response.status}`);
