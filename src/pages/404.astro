@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="페이지를 찾을 수 없습니다 — 달레줄레 팟캐스트">
+  <Header />
+  <main id="main-content" class="max-w-2xl mx-auto px-4 py-20 text-center">
+    <p class="text-6xl font-black text-[#FF6600] mb-4">404</p>
+    <h1 class="text-2xl font-extrabold text-gray-900 mb-3">페이지를 찾을 수 없습니다</h1>
+    <p class="text-gray-500 mb-8">주소가 바뀌었거나 삭제된 페이지입니다.</p>
+    <a
+      href="/"
+      class="inline-flex items-center gap-1 px-5 py-2.5 bg-[#FF6600] text-white text-sm font-bold rounded-full hover:bg-[#C04E00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2"
+    >
+      모든 에피소드 보기
+    </a>
+  </main>
+  <Footer />
+</Layout>
