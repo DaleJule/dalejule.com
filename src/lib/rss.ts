@@ -2,6 +2,7 @@ import { XMLParser } from 'fast-xml-parser';
 import type { PodcastMeta, Episode } from './types';
 
 const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
+const SITE_URL = 'https://dalejule.com';
 
 function formatDuration(duration: string | number): string {
   if (!duration) return '';
@@ -114,6 +115,18 @@ export function getPodcastData(): Promise<PodcastData> {
   return podcastData;
 }
 
+// 피드 CDN은 엣지마다 최대 7일간 캐시되어 최신 에피소드가 빠진 스냅샷을 줄 때가 있다.
+// 이미 공개된 에피소드가 피드에 없으면 빌드를 실패시켜 마지막 정상 배포를 유지한다
+async function assertFeedIsCurrent(episodeCount: number): Promise<void> {
+  const nextEpisodeUrl = `${SITE_URL}/episodes/${episodeCount + 1}/`;
+  const response = await fetch(nextEpisodeUrl, { method: 'HEAD' });
+  if (response.ok) {
+    throw new Error(
+      `RSS feed has ${episodeCount} episodes but ${nextEpisodeUrl} is already live. Refusing to build from a stale feed.`
+    );
+  }
+}
+
 async function fetchPodcastData(): Promise<PodcastData> {
   const response = await fetch(RSS_URL);
   if (!response.ok) {
@@ -157,6 +170,8 @@ async function fetchPodcastData(): Promise<PodcastData> {
       listenUrl: toText(item?.link) || item?.enclosure?.['@_url'] || '',
     };
   });
+
+  await assertFeedIsCurrent(episodes.length);
 
   return { meta, episodes };
 }
