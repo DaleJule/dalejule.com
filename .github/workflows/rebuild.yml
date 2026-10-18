@@ -9,7 +9,21 @@ jobs:
   trigger-rebuild:
     runs-on: ubuntu-latest
     steps:
+      - name: Check for a new episode
+        id: check
+        if: github.event_name == 'schedule'
+        run: |
+          count=$(curl -fsSL "$RSS_URL" | grep -o '<item>' | wc -l)
+          status=$(curl -s -o /dev/null -w '%{http_code}' -I "https://dalejule.com/episodes/$count/")
+          echo "RSS has $count episodes; /episodes/$count/ returned $status"
+          if [ "$status" = "404" ]; then
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          RSS_URL: https://anchor.fm/s/9cd202e8/podcast/rss
+
       - name: Trigger Cloudflare Pages deploy hook
+        if: github.event_name == 'workflow_dispatch' || steps.check.outputs.new == 'true'
         run: |
           curl -fsSL -X POST "$DEPLOY_HOOK_URL"
         env:
