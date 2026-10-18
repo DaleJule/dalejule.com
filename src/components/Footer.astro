@@ -2,8 +2,15 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-gray-200 mt-8">
-  <div class="max-w-4xl mx-auto px-4 py-6 text-center text-sm text-gray-400">
-    © {year} DaleJule · 달레줄레
+<footer class="border-t border-line-soft bg-abyss">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-wrap items-center justify-between gap-6">
+    <div class="flex items-center gap-3.5">
+      <img src="/favicon.svg" alt="" width="44" height="44" class="size-11 rounded-xl" />
+      <div>
+        <p class="text-lg font-black">달레줄레</p>
+        <p class="mt-1 text-sm text-dim">프로그래머가 들려주는 프로그래밍 팟캐스트</p>
+      </div>
+    </div>
+    <p class="font-mono text-[13px] text-dim">© {year} DaleJule</p>
   </div>
 </footer>

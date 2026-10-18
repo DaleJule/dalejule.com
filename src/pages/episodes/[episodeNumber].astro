@@ -1,8 +1,12 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import { getPodcastData } from '../../lib/rss';
+import { formatDate } from '../../lib/format';
+import { platforms } from '../../lib/platforms';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import CoverFallback from '../../components/CoverFallback.astro';
 import Giscus from '../../components/Giscus.astro';
 import type { Episode } from '../../lib/types';
 export async function getStaticPaths() {
@@ -32,20 +36,7 @@ const ogImage = episode.imageUrl
   ? await getImage({ src: episode.imageUrl, width: 1200, height: 1200, format: 'jpg' })
   : undefined;
 
-const platforms = [
-  { name: 'Apple', url: 'https://dales.link/applepodcast', icon: '/icons/apple-podcasts.svg' },
-  { name: 'Spotify', url: 'https://open.spotify.com/show/0b6RO7JD2DgGxVGRHN701H', icon: '/icons/spotify.svg' },
-  { name: 'YouTube', url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W', icon: '/icons/youtube.svg' },
-  { name: '팟빵', url: 'https://www.podbbang.com/channels/1784466/', icon: '/icons/podbbang.svg' },
-].filter(({ url }) => url);
-
-const formattedDate = episode.publishDate
-  ? new Date(episode.publishDate).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  : '';
+const formattedDate = formatDate(episode.publishDate);
 ---
 
 <Layout
@@ -57,63 +48,89 @@ const formattedDate = episode.publishDate
   twitterCard={ogImage ? 'summary' : undefined}
 >
   <Header />
-  <main id="main-content" class="max-w-2xl mx-auto px-4 py-10">
-    <!-- 뒤로가기 -->
-    <a
-      href="/"
-      class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-[#FF6600] transition-colors mb-8"
-    >
-      ← 모든 에피소드
-    </a>
-
-    <!-- 에피소드 헤더 -->
-    <div class="flex items-start gap-4 mb-6">
+  <main id="main-content">
+    <section aria-labelledby="episode-title" class="relative overflow-hidden border-b border-line-soft">
       {episode.imageUrl && (
-        <!-- fetchpriority="high": above-fold critical image -->
+        <!-- 커버를 흐리게 깔아 에피소드마다 다른 분위기를 낸다. 아래 커버와 같은 변환이라 추가 다운로드가 없다 -->
         <Image
           src={episode.imageUrl}
           alt=""
-          width={224}
-          height={224}
+          width={640}
+          height={640}
           format="webp"
-          loading="eager"
-          fetchpriority="high"
-          class="flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl object-cover bg-gray-100"
+          aria-hidden="true"
+          class="absolute -inset-20 w-[calc(100%+10rem)] h-[calc(100%+10rem)] max-w-none object-cover blur-[70px] saturate-[1.3] opacity-35"
         />
       )}
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-black text-[#FF6600] mb-1">EP.{episode.episodeNumber}</p>
-        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-2">
-          {episode.title}
-        </h1>
-        <div class="flex items-center gap-2 text-sm text-gray-500">
-          {formattedDate && <span>{formattedDate}</span>}
-          {episode.duration && formattedDate && <span aria-hidden="true">·</span>}
-          {episode.duration && <span>{episode.duration}</span>}
+      <div class="absolute inset-0 bg-midnight/55" aria-hidden="true"></div>
+
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-12 sm:pb-14">
+        <a
+          href="/"
+          class="inline-flex items-center gap-1.5 min-h-11 mb-6 sm:mb-10 text-[15px] font-bold text-mist hover:text-neon-soft transition-colors"
+        >
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+          모든 에피소드
+        </a>
+
+        <div class="flex flex-wrap items-end gap-8 sm:gap-12">
+          <div class="w-48 sm:w-80 max-w-full shrink-0 rounded-3xl border border-line overflow-hidden shadow-[0_0_60px_rgba(255,122,26,0.3),0_30px_80px_rgba(0,0,0,0.6)]">
+            {episode.imageUrl ? (
+              <!-- fetchpriority="high": above-fold critical image -->
+              <Image
+                src={episode.imageUrl}
+                alt=""
+                width={640}
+                height={640}
+                format="webp"
+                loading="eager"
+                fetchpriority="high"
+                class="block w-full aspect-square object-cover"
+              />
+            ) : (
+              <CoverFallback episodeNumber={episode.episodeNumber} />
+            )}
+          </div>
+
+          <div class="flex-[1_1_480px] min-w-0 flex flex-col gap-5">
+            <p class="font-mono text-[15px] font-bold tracking-wide text-neon-soft">EP.{episode.episodeNumber}</p>
+            <h1 id="episode-title" class="text-3xl sm:text-[46px] leading-tight font-black tracking-tight">
+              {episode.title}
+            </h1>
+            <div class="flex flex-wrap gap-2.5 font-mono text-sm text-mist">
+              {formattedDate && <span>{formattedDate}</span>}
+              {episode.duration && formattedDate && <span class="text-line" aria-hidden="true">/</span>}
+              {episode.duration && <span>{episode.duration}</span>}
+            </div>
+            <div class="flex flex-wrap gap-2.5 mt-1">
+              {platforms.map(({ shortName, url, icon }) => (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 h-11 px-4.5 rounded-full bg-panel/80 border border-line text-[15px] font-bold hover:border-neon-soft hover:text-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+                >
+                  <span class="size-4 [&>svg]:size-full" aria-hidden="true" set:html={icon} />
+                  {shortName}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
+      {descriptionHtml && (
+        <article aria-labelledby="notes-title">
+          <p class="mb-2 font-mono text-[13px] tracking-wider text-neon-soft" aria-hidden="true">// SHOW NOTES</p>
+          <h2 id="notes-title" class="mb-7 text-[28px] font-black tracking-tight">쇼노트</h2>
+          <div class="prose max-w-none" set:html={descriptionHtml} />
+        </article>
+      )}
+
+      <Giscus />
     </div>
-
-    <!-- 플랫폼 듣기 버튼 -->
-    <div class="flex flex-wrap gap-2 mb-8">
-      {platforms.map(({ name, url, icon }) => (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 text-sm font-semibold rounded-full hover:border-[#FF6600] hover:text-[#FF6600] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2"
-        >
-          <img src={icon} alt="" width="16" height="16" class="w-4 h-4" />
-          {name}
-        </a>
-      ))}
-    </div>
-
-    <!-- 에피소드 설명 -->
-    {descriptionHtml && (
-      <div class="prose max-w-none" set:html={descriptionHtml} />
-    )}
-
-    <Giscus />
   </main>
+  <Footer />
 </Layout>

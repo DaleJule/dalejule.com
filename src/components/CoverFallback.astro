@@ -1,0 +1,18 @@
+---
+interface Props {
+  episodeNumber: number;
+}
+
+const { episodeNumber } = Astro.props;
+---
+
+<!-- 전용 커버가 없는 에피소드용. 쇼 아트(오렌지)는 다크 그리드에서 혼자 튀어서 대신 쓴다 -->
+<div class="relative aspect-square overflow-hidden bg-[#0c1430] p-7 flex flex-col justify-between" aria-hidden="true">
+  <div class="absolute -right-1/5 -bottom-1/5 size-[70%] rounded-full bg-neon opacity-30 blur-[80px]"></div>
+  <span class="relative font-mono text-[15px] text-dim">~/dalejule/episodes</span>
+  <span class="relative font-mono text-7xl sm:text-[88px] font-bold leading-none tracking-tighter">EP.{episodeNumber}</span>
+  <span class="relative flex items-center gap-3">
+    <img src="/favicon.svg" alt="" width="40" height="40" class="size-10 rounded-[10px]" />
+    <span class="text-xl font-black">달레줄레</span>
+  </span>
+</div>

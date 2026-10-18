@@ -1,34 +1,78 @@
 ---
-import type { PodcastMeta } from '../lib/types';
+import { Image } from 'astro:assets';
+import type { Episode } from '../lib/types';
+import { formatDate } from '../lib/format';
+import CoverFallback from './CoverFallback.astro';
 
 interface Props {
-  meta: PodcastMeta;
+  episode: Episode;
 }
 
-const { meta } = Astro.props;
-
+const { episode } = Astro.props;
+const episodeUrl = `/episodes/${episode.episodeNumber}`;
 ---
 
-<section class="bg-[#FF6600] text-white">
-  <div class="max-w-4xl mx-auto px-4 py-16 flex flex-col items-center text-center gap-6">
-    <div class="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center p-2">
-      <!-- fetchpriority="high": above-fold critical image -->
-      <img
-        src="/icon.svg"
-        alt="달레줄레 로고"
-        width="128"
-        height="128"
-        fetchpriority="high"
-        class="w-full h-full"
-        style="filter: brightness(0) invert(1);"
-      />
+<section aria-labelledby="latest-title" class="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 sm:pt-18 sm:pb-22 flex flex-wrap items-center gap-12 lg:gap-14">
+  <div class="flex-[1_1_460px] min-w-0 flex flex-col gap-6">
+    <div class="flex flex-wrap items-center gap-2.5 font-mono text-[13px] font-medium tracking-wide">
+      <span class="px-2.5 py-1 rounded-full bg-neon text-on-neon font-bold">NEW</span>
+      <span class="text-neon-soft">EP.{episode.episodeNumber}</span>
+      <span class="text-line" aria-hidden="true">/</span>
+      <span class="text-mist">{formatDate(episode.publishDate)}</span>
+      {episode.duration && <span class="text-line" aria-hidden="true">/</span>}
+      {episode.duration && <span class="text-mist">{episode.duration}</span>}
     </div>
-
-    <div>
-      <!-- text-4xl font-black = 36px bold → WCAG 대형 텍스트, 흰색 on #FF6600 = 2.94:1 (borderline) -->
-      <h1 class="text-4xl font-black tracking-tight mb-2">{meta.title}</h1>
-      <p class="text-white/90 text-lg max-w-md">{meta.description}</p>
+    <h1 id="latest-title" class="text-4xl sm:text-5xl lg:text-[52px] leading-[1.18] font-black tracking-tight">
+      {episode.title}
+    </h1>
+    <p class="text-lg leading-relaxed text-mist max-w-xl line-clamp-3">{episode.description}</p>
+    <div class="flex flex-wrap gap-3 mt-2">
+      {episode.listenUrl && (
+        <a
+          href={episode.listenUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2.5 h-13 px-6.5 rounded-full bg-neon text-on-neon text-[17px] font-extrabold shadow-[0_0_32px_rgba(255,122,26,0.45)] hover:bg-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
+        >
+          <svg class="size-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
+          지금 듣기
+        </a>
+      )}
+      <a
+        href={episodeUrl}
+        class="inline-flex items-center gap-2 h-13 px-6 rounded-full border border-line text-[17px] font-bold hover:border-neon-soft hover:text-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
+      >
+        쇼노트 보기
+        <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
     </div>
+  </div>
 
+  <div class="relative flex-[0_1_460px] min-w-0 mx-auto">
+    <div class="absolute inset-[8%_-6%_-4%_10%] rounded-[48px] bg-neon opacity-35 blur-[90px]" aria-hidden="true"></div>
+    <div class="absolute inset-[-6%_18%_30%_-8%] rounded-[48px] bg-glow-blue opacity-35 blur-[100px]" aria-hidden="true"></div>
+    <div class="relative rounded-3xl border border-line bg-panel overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-line-soft" aria-hidden="true">
+        <span class="size-[11px] rounded-full bg-[#ff5f57]"></span>
+        <span class="size-[11px] rounded-full bg-[#febc2e]"></span>
+        <span class="size-[11px] rounded-full bg-[#28c840]"></span>
+        <span class="ml-auto font-mono text-xs text-dim">now_playing.mp3</span>
+      </div>
+      {episode.imageUrl ? (
+        <!-- fetchpriority="high": above-fold critical image -->
+        <Image
+          src={episode.imageUrl}
+          alt=""
+          width={920}
+          height={920}
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+          class="block w-full aspect-square object-cover"
+        />
+      ) : (
+        <CoverFallback episodeNumber={episode.episodeNumber} />
+      )}
+    </div>
   </div>
 </section>

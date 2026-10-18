@@ -1,68 +1,51 @@
 ---
 import { Image } from 'astro:assets';
 import type { Episode } from '../lib/types';
+import { formatDate } from '../lib/format';
+import CoverFallback from './CoverFallback.astro';
 
 interface Props {
   episode: Episode;
 }
 
 const { episode } = Astro.props;
-
-const formattedDate = episode.publishDate
-  ? new Date(episode.publishDate).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  : '';
+const formattedDate = formatDate(episode.publishDate);
 ---
 
-<li class="flex gap-4 py-5 border-b border-gray-100 last:border-0">
-  {episode.imageUrl && (
+<li class="group relative flex flex-col rounded-[20px] bg-panel border border-line-soft overflow-hidden hover:border-line transition-colors focus-within:ring-2 focus-within:ring-neon">
+  {episode.imageUrl ? (
     <Image
       src={episode.imageUrl}
       alt=""
-      width={128}
-      height={128}
+      width={640}
+      height={640}
       format="webp"
-      class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover bg-gray-100"
+      class="block w-full aspect-square object-cover bg-raised"
     />
+  ) : (
+    <CoverFallback episodeNumber={episode.episodeNumber} />
   )}
 
-  <!-- 콘텐츠 -->
-  <div class="flex-1 min-w-0">
-    <h3 class="font-bold text-gray-900 leading-snug mb-1">
-      <a href={`/episodes/${episode.episodeNumber}`} class="hover:text-[#FF6600] transition-colors">
+  <div class="flex-1 flex flex-col gap-2.5 px-5.5 pt-5 pb-5.5">
+    <!-- text-dim on panel = 5.67:1 (WCAG AA) -->
+    <div class="flex flex-wrap gap-2 font-mono text-xs text-dim whitespace-nowrap">
+      <span class="text-neon-soft font-bold">EP.{episode.episodeNumber}</span>
+      {formattedDate && <span aria-hidden="true">·</span>}
+      {formattedDate && <span>{formattedDate}</span>}
+      {episode.duration && <span aria-hidden="true">·</span>}
+      {episode.duration && <span>{episode.duration}</span>}
+    </div>
+    <h3 class="text-[19px] leading-snug font-extrabold tracking-tight">
+      <!-- after:inset-0 으로 카드 전체를 클릭 영역으로 만든다 -->
+      <a
+        href={`/episodes/${episode.episodeNumber}`}
+        class="group-hover:text-neon-soft transition-colors focus-visible:outline-none after:absolute after:inset-0"
+      >
         {episode.title}
       </a>
     </h3>
     {episode.description && (
-      <p class="text-gray-500 text-sm line-clamp-2 mb-2">
-        {episode.description}
-      </p>
+      <p class="text-[15px] leading-relaxed text-mist line-clamp-2">{episode.description}</p>
     )}
-    <!-- text-gray-500 on white = 4.63:1 (WCAG AA) -->
-    <div class="flex flex-wrap items-center gap-x-2 text-xs text-gray-500 whitespace-nowrap">
-      <span class="font-bold">EP.{episode.episodeNumber}</span>
-      {formattedDate && <span aria-hidden="true">·</span>}
-      {formattedDate && <span>{formattedDate}</span>}
-      {episode.duration && formattedDate && <span aria-hidden="true">·</span>}
-      {episode.duration && <span>{episode.duration}</span>}
-    </div>
   </div>
-
-  <!-- 듣기 버튼 -->
-  {episode.listenUrl && (
-    <div class="flex-shrink-0 flex items-start pt-1">
-      <a
-        href={episode.listenUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${episode.title} 듣기`}
-        class="px-3 py-1.5 border border-[#FF6600] text-[#FF6600] text-xs font-bold rounded-full hover:bg-[#FF6600] hover:text-white transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-1"
-      >
-        ▶ 듣기
-      </a>
-    </div>
-  )}
 </li>

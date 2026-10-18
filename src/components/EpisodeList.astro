@@ -1,24 +1,72 @@
 ---
 import type { Episode } from '../lib/types';
+import { formatDate } from '../lib/format';
 import EpisodeCard from './EpisodeCard.astro';
 
 interface Props {
   episodes: Episode[];
+  totalCount: number;
 }
 
-const { episodes } = Astro.props;
+const { episodes, totalCount } = Astro.props;
+
+// 커버가 있는 최근 에피소드는 카드로 크게, 나머지는 한 줄씩 보여준다
+const RECENT_COUNT = 6;
+const recent = episodes.slice(0, RECENT_COUNT);
+const archive = episodes.slice(RECENT_COUNT);
 ---
 
-<section class="max-w-4xl mx-auto px-4 py-8">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-xl font-black text-gray-900">
-      에피소드 · <span class="text-[#FF6600]">{episodes.length}개</span>
-    </h2>
+<section aria-labelledby="recent-title" class="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+  <div class="flex flex-wrap items-end justify-between gap-4 mb-7">
+    <div>
+      <p class="mb-2 font-mono text-[13px] tracking-wider text-neon-soft" aria-hidden="true">// RECENT</p>
+      <h2 id="recent-title" class="text-[28px] sm:text-[32px] font-black tracking-tight">최근 에피소드</h2>
+    </div>
+    {archive.length > 0 && (
+      <a href="#archive" class="inline-flex items-center gap-1.5 min-h-11 text-[15px] font-bold text-mist hover:text-neon-soft transition-colors">
+        전체 {totalCount}편 보기
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    )}
   </div>
 
-  <ol class="list-none" reversed>
-    {episodes.map((episode) => (
-      <EpisodeCard episode={episode} />
-    ))}
-  </ol>
+  <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-6">
+    {recent.map((episode) => <EpisodeCard episode={episode} />)}
+  </ul>
 </section>
+
+{archive.length > 0 && (
+  <section id="archive" aria-labelledby="archive-title" class="max-w-6xl mx-auto px-4 sm:px-6 pb-24 scroll-mt-20">
+    <div class="mb-5">
+      <p class="mb-2 font-mono text-[13px] tracking-wider text-neon-soft" aria-hidden="true">// ARCHIVE</p>
+      <h2 id="archive-title" class="text-[28px] sm:text-[32px] font-black tracking-tight">지난 에피소드</h2>
+    </div>
+
+    <ol class="border-t border-line-soft" reversed>
+      {archive.map((episode) => (
+        <li class="flex flex-wrap items-center gap-x-5 gap-y-1 py-4.5 px-1 border-b border-line-soft">
+          <span class="w-16 font-mono text-[15px] font-bold text-neon-soft">EP.{episode.episodeNumber}</span>
+          <a
+            href={`/episodes/${episode.episodeNumber}`}
+            class="flex-[1_1_280px] min-w-0 text-[17px] font-bold hover:text-neon-soft transition-colors focus-visible:outline-none focus-visible:underline"
+          >
+            {episode.title}
+          </a>
+          <span class="font-mono text-[13px] text-dim">{formatDate(episode.publishDate)}</span>
+          <span class="w-18 text-right font-mono text-[13px] text-dim">{episode.duration}</span>
+          {episode.listenUrl && (
+            <a
+              href={episode.listenUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`EP.${episode.episodeNumber} ${episode.title} 듣기`}
+              class="size-11 shrink-0 flex items-center justify-center rounded-full border border-line text-neon-soft hover:bg-neon hover:text-on-neon hover:border-neon transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+            >
+              <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
+            </a>
+          )}
+        </li>
+      ))}
+    </ol>
+  </section>
+)}

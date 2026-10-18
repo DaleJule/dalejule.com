@@ -1,48 +1,33 @@
 ---
-const platforms = [
-  {
-    name: 'Apple Podcasts',
-    url: 'https://dales.link/applepodcast',
-    icon: '/icons/apple-podcasts.svg',
-  },
-  {
-    name: 'Spotify',
-    url: 'https://open.spotify.com/show/0b6RO7JD2DgGxVGRHN701H',
-    icon: '/icons/spotify.svg',
-  },
-  {
-    name: 'YouTube',
-    url: 'https://www.youtube.com/playlist?list=PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W',
-    icon: '/icons/youtube.svg',
-  },
-  {
-    name: '팟빵',
-    url: 'https://www.podbbang.com/channels/1784466/',
-    icon: '/icons/podbbang.svg',
-  },
-];
+import { platforms, rssFeed } from '../lib/platforms';
+
+const links = [...platforms, rssFeed];
+// 로고 옆 사운드웨이브 막대 높이(px)
+const waveBars = [8, 16, 11, 20, 9];
 ---
 
-<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
-  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+<header class="sticky top-0 z-50 bg-midnight/85 backdrop-blur border-b border-line-soft">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
     <a
       href="/"
-      class="text-xl font-black text-[#FF6600] tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600] focus-visible:ring-offset-2 focus-visible:rounded"
+      class="flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
     >
-      달레줄레
-      <span class="text-xs font-medium text-gray-400 tracking-widest">DaleJule</span>
+      <img src="/favicon.svg" alt="" width="40" height="40" class="size-9 sm:size-10 rounded-[10px]" />
+      <span class="text-xl sm:text-[22px] font-black tracking-tight">달레줄레</span>
+      <span class="hidden sm:flex items-center gap-[3px] h-5" aria-hidden="true">
+        {waveBars.map((height) => <span class="w-[3px] rounded-sm bg-neon" style={`height: ${height}px`} />)}
+      </span>
     </a>
-    <nav aria-label="플랫폼 링크" class="flex items-center gap-3">
-      {platforms.map(({ name, url, icon }) => (
+    <nav aria-label="플랫폼 링크" class="flex items-center">
+      {links.map(({ name, url, icon }) => (
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={name}
-          class="w-7 h-7 text-gray-500 hover:text-[#FF6600] transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C04E00] focus-visible:ring-offset-2 focus-visible:rounded"
+          class="size-11 flex items-center justify-center rounded-xl text-mist hover:text-neon-soft hover:bg-panel transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
         >
-          <!-- alt="" — 부모 <a>의 aria-label이 레이블을 제공 -->
-          <img src={icon} alt="" width="24" height="24" class="w-6 h-6" />
+          <span class="size-5 [&>svg]:size-full" aria-hidden="true" set:html={icon} />
         </a>
       ))}
     </nav>

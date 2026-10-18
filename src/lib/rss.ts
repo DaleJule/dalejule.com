@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import type { PodcastMeta, Episode } from './types';
 
-const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
+export const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
 const SITE_URL = 'https://dalejule.com';
 
 function formatDuration(duration: string | number): string {
@@ -156,6 +156,8 @@ async function fetchPodcastData(): Promise<PodcastData> {
 
   const episodes: Episode[] = items.map((item: any, index: number) => {
     const rawDesc = item?.['itunes:summary'] || item?.description || '';
+    // 전용 커버가 없는 에피소드는 피드에 쇼 아트가 들어 있으므로 커버 없음으로 취급한다
+    const episodeImageUrl = toText(item?.['itunes:image']?.['@_href']);
 
     return {
       guid: toText(item?.guid) || String(index),
@@ -165,7 +167,7 @@ async function fetchPodcastData(): Promise<PodcastData> {
       descriptionHtml: processDescriptionHtml(rawDesc),
       publishDate: toText(item?.pubDate),
       duration: formatDuration(item?.['itunes:duration'] || ''),
-      imageUrl: toText(item?.['itunes:image']?.['@_href']) || meta.imageUrl,
+      imageUrl: episodeImageUrl === meta.imageUrl ? '' : episodeImageUrl,
       audioUrl: item?.enclosure?.['@_url'] || '',
       listenUrl: toText(item?.link) || item?.enclosure?.['@_url'] || '',
     };
