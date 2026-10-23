@@ -1,4 +1,4 @@
-name: Rebuild site for new RSS episodes
+name: Rebuild site
 
 on:
   schedule:
@@ -8,6 +8,8 @@ on:
 jobs:
   trigger-rebuild:
     runs-on: ubuntu-latest
+    permissions:
+      checks: read
     steps:
       - name: Check for a new episode
         id: check
@@ -22,8 +24,23 @@ jobs:
         env:
           RSS_URL: https://anchor.fm/s/9cd202e8/podcast/rss
 
+      # 피드 CDN은 쿼리 문자열과 no-cache를 무시하므로 오래된 피드로 실패한 배포는 다시 시도하는 수밖에 없다
+      - name: Check whether the last deploy failed
+        id: deploy
+        if: github.event_name == 'schedule'
+        run: |
+          # 이 API는 이름별로 가장 최근 실행만 돌려준다(filter=latest)
+          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?check_name=Cloudflare%20Pages" \
+            --jq '.check_runs[0].conclusion')
+          echo "Last Cloudflare Pages deploy of $GITHUB_SHA: $conclusion"
+          if [ "$conclusion" = "failure" ]; then
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Trigger Cloudflare Pages deploy hook
-        if: github.event_name == 'workflow_dispatch' || steps.check.outputs.new == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.check.outputs.new == 'true' || steps.deploy.outputs.failed == 'true'
         run: |
           curl -fsSL -X POST "$DEPLOY_HOOK_URL"
         env:
