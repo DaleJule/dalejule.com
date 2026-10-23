@@ -1,0 +1,32 @@
+---
+import type { Chapter } from '../lib/types';
+
+interface Props {
+  chapters: Chapter[];
+}
+
+const { chapters } = Astro.props;
+---
+
+<!-- 버튼 동작(재생 위치 이동, 현재 챕터 표시)은 EpisodePlayer의 스크립트가 붙인다 -->
+<aside aria-labelledby="chapters-title" class="rounded-[20px] bg-panel border border-line-soft overflow-hidden">
+  <div class="flex items-center justify-between px-5 py-4.5 border-b border-line-soft">
+    <h2 id="chapters-title" class="text-lg font-extrabold">챕터</h2>
+    <span class="font-mono text-xs text-dim">{chapters.length} chapters</span>
+  </div>
+  <ol class="p-2">
+    {chapters.map(({ start, time, title }) => (
+      <li>
+        <button
+          type="button"
+          data-chapter-start={start}
+          data-chapter-title={title}
+          class="group/chapter w-full flex gap-3.5 items-baseline px-3 py-2.5 rounded-[10px] text-left cursor-pointer hover:bg-raised data-[state=current]:bg-raised transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+        >
+          <span class="shrink-0 font-mono text-[13px] text-dim group-data-[state=current]/chapter:text-neon-soft">{time}</span>
+          <span class="text-[15px] leading-normal text-ink group-data-[state=past]/chapter:text-dim">{title}</span>
+        </button>
+      </li>
+    ))}
+  </ol>
+</aside>

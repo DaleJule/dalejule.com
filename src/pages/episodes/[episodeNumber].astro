@@ -7,6 +7,8 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import CoverFallback from '../../components/CoverFallback.astro';
+import EpisodePlayer from '../../components/EpisodePlayer.astro';
+import EpisodeChapters from '../../components/EpisodeChapters.astro';
 import Giscus from '../../components/Giscus.astro';
 import type { Episode } from '../../lib/types';
 export async function getStaticPaths() {
@@ -117,17 +119,30 @@ const formattedDate = formatDate(episode.publishDate);
             </div>
           </div>
         </div>
+
+        {episode.audioUrl && (
+          <div class="mt-10 sm:mt-12">
+            <EpisodePlayer episode={episode} />
+          </div>
+        )}
       </div>
     </section>
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-      {descriptionHtml && (
-        <article aria-labelledby="notes-title">
-          <p class="mb-2 font-mono text-[13px] tracking-wider text-neon-soft" aria-hidden="true">// SHOW NOTES</p>
-          <h2 id="notes-title" class="mb-7 text-[28px] font-black tracking-tight">쇼노트</h2>
-          <div class="prose max-w-none" set:html={descriptionHtml} />
-        </article>
-      )}
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
+      <div class="flex flex-wrap items-start gap-12 lg:gap-14">
+        {descriptionHtml && (
+          <article aria-labelledby="notes-title" class="flex-[999_1_560px] min-w-0 max-w-3xl">
+            <p class="mb-2 font-mono text-[13px] tracking-wider text-neon-soft" aria-hidden="true">// SHOW NOTES</p>
+            <h2 id="notes-title" class="mb-7 text-[28px] font-black tracking-tight">쇼노트</h2>
+            <div class="prose max-w-none" set:html={descriptionHtml} />
+          </article>
+        )}
+        {episode.audioUrl && episode.chapters.length > 0 && (
+          <div class="flex-[1_1_340px] min-w-0">
+            <EpisodeChapters chapters={episode.chapters} />
+          </div>
+        )}
+      </div>
 
       <Giscus />
     </div>

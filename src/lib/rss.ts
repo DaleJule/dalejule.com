@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
-import type { PodcastMeta, Episode } from './types';
+import type { PodcastMeta, Episode, Chapter } from './types';
+import { toSeconds } from './format';
 
 export const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
 const SITE_URL = 'https://dalejule.com';
@@ -105,6 +106,23 @@ function processDescriptionHtml(raw: unknown): string {
   return parts.join('');
 }
 
+// 챕터 표기는 에피소드마다 다르다: <li><p>00:00 제목</p></li>, <li>00:00 제목</li>, <p>00:00 제목</p>
+const CHAPTER_PATTERN =
+  /<(li|p)\b[^>]*>\s*(?:<p\b[^>]*>)?\s*((?:\d{1,2}:)?\d{1,2}:\d{2})\s+([^<]+?)\s*(?:<\/p>\s*)?<\/\1>/gi;
+
+// 쇼노트에서 챕터 목록을 떼어내 따로 돌려준다. 남은 빈 목록과 "챕터"·"목차" 제목도 지운다
+function extractChapters(raw: unknown): { chapters: Chapter[]; html: string } {
+  const chapters: Chapter[] = [];
+  const html = toText(raw)
+    .replace(CHAPTER_PATTERN, (_match, _tag, time: string, title: string) => {
+      chapters.push({ start: toSeconds(time), time, title: title.trim() });
+      return '';
+    })
+    .replace(/<ul\b[^>]*>\s*<\/ul>/gi, '')
+    .replace(/<p\b[^>]*>\s*(?:##\s*)?(?:챕터|목차)\s*<\/p>/gi, '');
+  return { chapters, html };
+}
+
 type PodcastData = { meta: PodcastMeta; episodes: Episode[] };
 
 // 빌드 중 페이지마다 RSS를 다시 받으면 서로 다른 스냅샷을 보게 되므로 한 번만 받는다
@@ -156,6 +174,7 @@ async function fetchPodcastData(): Promise<PodcastData> {
 
   const episodes: Episode[] = items.map((item: any, index: number) => {
     const rawDesc = item?.['itunes:summary'] || item?.description || '';
+    const { chapters, html: notesHtml } = extractChapters(rawDesc);
     // 전용 커버가 없는 에피소드는 피드에 쇼 아트가 들어 있으므로 커버 없음으로 취급한다
     const episodeImageUrl = toText(item?.['itunes:image']?.['@_href']);
 
@@ -164,12 +183,13 @@ async function fetchPodcastData(): Promise<PodcastData> {
       episodeNumber: total - index,
       title: toText(item?.title),
       description: stripHtml(rawDesc),
-      descriptionHtml: processDescriptionHtml(rawDesc),
+      descriptionHtml: processDescriptionHtml(notesHtml),
       publishDate: toText(item?.pubDate),
       duration: formatDuration(item?.['itunes:duration'] || ''),
       imageUrl: episodeImageUrl === meta.imageUrl ? '' : episodeImageUrl,
       audioUrl: item?.enclosure?.['@_url'] || '',
       listenUrl: toText(item?.link) || item?.enclosure?.['@_url'] || '',
+      chapters,
     };
   });
 

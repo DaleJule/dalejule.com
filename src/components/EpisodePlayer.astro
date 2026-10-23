@@ -1,0 +1,139 @@
+---
+import type { Episode } from '../lib/types';
+import { formatTime, toSeconds } from '../lib/format';
+
+interface Props {
+  episode: Episode;
+}
+
+const { episode } = Astro.props;
+const totalSeconds = episode.duration ? toSeconds(episode.duration) : 0;
+const withHours = totalSeconds >= 3600;
+const firstChapter = episode.chapters[0]?.title ?? episode.title;
+---
+
+<div
+  data-player
+  data-with-hours={withHours ? 'true' : 'false'}
+  class="group rounded-[20px] border border-line bg-panel/90 overflow-hidden"
+>
+  <div class="flex items-center gap-2 px-4.5 py-3 border-b border-line-soft" aria-hidden="true">
+    <span class="size-[11px] rounded-full bg-[#ff5f57]"></span>
+    <span class="size-[11px] rounded-full bg-[#febc2e]"></span>
+    <span class="size-[11px] rounded-full bg-[#28c840]"></span>
+    <span class="ml-auto font-mono text-xs text-dim">ep{episode.episodeNumber}.mp3</span>
+  </div>
+
+  <!-- preload="none": 재생하기 전에는 오디오를 받지 않는다 -->
+  <audio src={episode.audioUrl} preload="none"></audio>
+
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-4 px-5 sm:px-6 py-5">
+    <button
+      type="button"
+      data-toggle
+      aria-label="재생"
+      class="size-16 shrink-0 flex items-center justify-center rounded-full bg-neon text-on-neon shadow-[0_0_32px_rgba(255,122,26,0.5)] hover:bg-neon-soft transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-panel"
+    >
+      <svg class="size-6 group-data-[playing]:hidden" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
+      <svg class="size-6 hidden group-data-[playing]:block" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
+    </button>
+
+    <div class="flex-[1_1_200px] min-w-0 flex flex-col gap-2">
+      <p data-current-chapter class="text-[15px] font-bold truncate">{firstChapter}</p>
+      <input
+        type="range"
+        data-seek-bar
+        min="0"
+        max={totalSeconds}
+        step="1"
+        value="0"
+        aria-label="재생 위치"
+        aria-valuetext={formatTime(0, withHours)}
+        class="w-full h-2 accent-neon cursor-pointer"
+      />
+      <div class="flex justify-between font-mono text-[13px] text-dim">
+        <span data-current-time class="text-neon-soft">{formatTime(0, withHours)}</span>
+        <span>{episode.duration}</span>
+      </div>
+    </div>
+
+    <div class="flex gap-1">
+      <button type="button" data-skip="-15" aria-label="15초 뒤로" class="size-11 rounded-xl border border-line text-mist font-mono text-xs font-bold hover:text-neon-soft hover:border-neon-soft transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon">-15</button>
+      <button type="button" data-skip="30" aria-label="30초 앞으로" class="size-11 rounded-xl border border-line text-mist font-mono text-xs font-bold hover:text-neon-soft hover:border-neon-soft transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon">+30</button>
+      <button type="button" data-rate aria-label="재생 속도 1배" class="w-14 h-11 rounded-xl border border-line text-mist font-mono text-xs font-bold hover:text-neon-soft hover:border-neon-soft transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon">1×</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { formatTime } from '../lib/format';
+
+  const RATES = [1, 1.25, 1.5, 2];
+
+  const player = document.querySelector<HTMLElement>('[data-player]');
+  if (player) {
+    const audio = player.querySelector('audio')!;
+    const toggle = player.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const seekBar = player.querySelector<HTMLInputElement>('[data-seek-bar]')!;
+    const currentTime = player.querySelector<HTMLElement>('[data-current-time]')!;
+    const currentChapter = player.querySelector<HTMLElement>('[data-current-chapter]')!;
+    const rateButton = player.querySelector<HTMLButtonElement>('[data-rate]')!;
+    const chapterButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-chapter-start]')];
+    const withHours = player.dataset.withHours === 'true';
+
+    // preload="none"이라 아직 아무것도 받지 않았으면 메타데이터가 온 뒤에 위치를 옮긴다
+    const seek = (seconds: number) => {
+      const target = Math.max(0, seconds);
+      if (audio.readyState === HTMLMediaElement.HAVE_NOTHING) {
+        audio.addEventListener('loadedmetadata', () => (audio.currentTime = target), { once: true });
+        audio.load();
+      } else {
+        audio.currentTime = target;
+      }
+    };
+
+    const render = () => {
+      const t = audio.currentTime;
+      seekBar.value = String(Math.floor(t));
+      seekBar.setAttribute('aria-valuetext', formatTime(t, withHours));
+      currentTime.textContent = formatTime(t, withHours);
+
+      const index = chapterButtons.findLastIndex((button) => Number(button.dataset.chapterStart) <= t);
+      chapterButtons.forEach((button, i) => {
+        button.dataset.state = i === index ? 'current' : i < index ? 'past' : '';
+        if (i === index) button.setAttribute('aria-current', 'true');
+        else button.removeAttribute('aria-current');
+      });
+      if (index >= 0) currentChapter.textContent = chapterButtons[index].dataset.chapterTitle ?? '';
+    };
+
+    toggle.addEventListener('click', () => (audio.paused ? audio.play() : audio.pause()));
+    audio.addEventListener('play', () => {
+      player.dataset.playing = '';
+      toggle.setAttribute('aria-label', '일시정지');
+    });
+    audio.addEventListener('pause', () => {
+      delete player.dataset.playing;
+      toggle.setAttribute('aria-label', '재생');
+    });
+    audio.addEventListener('loadedmetadata', () => (seekBar.max = String(Math.floor(audio.duration))));
+    audio.addEventListener('timeupdate', render);
+
+    seekBar.addEventListener('input', () => seek(Number(seekBar.value)));
+    player.querySelectorAll<HTMLButtonElement>('[data-skip]').forEach((button) =>
+      button.addEventListener('click', () => seek(audio.currentTime + Number(button.dataset.skip))),
+    );
+    rateButton.addEventListener('click', () => {
+      const rate = RATES[(RATES.indexOf(audio.playbackRate) + 1) % RATES.length];
+      audio.playbackRate = rate;
+      rateButton.textContent = `${rate}×`;
+      rateButton.setAttribute('aria-label', `재생 속도 ${rate}배`);
+    });
+    chapterButtons.forEach((button) =>
+      button.addEventListener('click', () => {
+        seek(Number(button.dataset.chapterStart));
+        audio.play();
+      }),
+    );
+  }
+</script>
