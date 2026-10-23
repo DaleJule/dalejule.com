@@ -12,7 +12,7 @@ const [latest, ...rest] = episodes;
 
 <Layout title="달레줄레 팟캐스트" description={meta.description}>
   <Header />
-  <main id="main-content">
+  <main id="main-content" class="overflow-x-clip">
     <Hero episode={latest} />
     <EpisodeList episodes={rest} totalCount={episodes.length} />
   </main>
