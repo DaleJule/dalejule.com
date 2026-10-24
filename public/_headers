@@ -1,0 +1,3 @@
+# Giscus는 테마 CSS를 crossorigin="anonymous"로 불러오므로 CORS 헤더가 없으면 적용되지 않는다
+/giscus-theme.css
+  Access-Control-Allow-Origin: https://giscus.app

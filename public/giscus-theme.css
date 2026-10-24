@@ -1,0 +1,38 @@
+/* Giscus 댓글 테마: transparent_dark 위에 사이트 팔레트(global.css의 @theme)를 덮어쓴다 */
+@import url("https://giscus.app/themes/transparent_dark.css");
+
+main {
+  /* 글자와 테두리 */
+  --color-fg-default: #f1f3fa;
+  --color-fg-muted: #aeb7d6;
+  --color-fg-subtle: #8691b8;
+  --color-border-default: #2f3b6b;
+  --color-border-muted: #1c2650;
+
+  /* 일반 버튼 */
+  --color-btn-text: #f1f3fa;
+  --color-btn-bg: #0f1733;
+  --color-btn-border: #2f3b6b;
+  --color-btn-hover-bg: #172146;
+  --color-btn-hover-border: #ff9a4d;
+  --color-btn-selected-bg: #172146;
+
+  /* "댓글 등록" 버튼: neon 바탕에 on-neon 글자 (7.27:1) */
+  --color-btn-primary-text: #0a0f24;
+  --color-btn-primary-bg: #ff7a1a;
+  --color-btn-primary-border: transparent;
+  --color-btn-primary-hover-bg: #ff9a4d;
+  --color-btn-primary-hover-border: transparent;
+  --color-btn-primary-selected-bg: #ff7a1a;
+  --color-btn-primary-disabled-text: rgb(10 15 36 / 60%);
+  --color-btn-primary-disabled-bg: rgb(255 122 26 / 40%);
+  --color-btn-primary-disabled-border: transparent;
+
+  /* 링크, 반응 버튼 등 강조색 */
+  --color-accent-fg: #ff9a4d;
+  --color-accent-emphasis: #ff7a1a;
+  --color-accent-muted: rgb(255 122 26 / 40%);
+  --color-accent-subtle: rgb(255 122 26 / 12%);
+  --color-social-reaction-bg-hover: #172146;
+  --color-social-reaction-bg-reacted-hover: rgb(255 122 26 / 20%);
+}
