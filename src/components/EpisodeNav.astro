@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import type { Episode } from '../lib/types';
+
+interface Props {
+  previous?: Episode;
+  next?: Episode;
+}
+
+const { previous, next } = Astro.props;
+const links = [
+  { episode: previous, label: '이전' },
+  { episode: next, label: '다음' },
+];
+---
+
+<nav aria-label="이전·다음 에피소드" class="mt-14 grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-4">
+  {links.map(({ episode, label }) =>
+    episode ? (
+      <a
+        href={`/episodes/${episode.episodeNumber}`}
+        class="group flex items-center gap-4 p-4 rounded-[18px] bg-panel border border-line-soft hover:border-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+      >
+        {episode.imageUrl ? (
+          <Image
+            src={episode.imageUrl}
+            alt=""
+            width={160}
+            height={160}
+            format="webp"
+            class="size-20 shrink-0 rounded-xl object-cover bg-raised"
+          />
+        ) : (
+          <span class="size-20 shrink-0 rounded-xl bg-raised flex items-center justify-center font-mono text-[15px] font-bold" aria-hidden="true">
+            EP.{episode.episodeNumber}
+          </span>
+        )}
+        <span class="flex flex-col gap-1.5 min-w-0">
+          <span class="font-mono text-xs text-dim">{label} · EP.{episode.episodeNumber}</span>
+          <span class="text-base font-extrabold leading-snug line-clamp-2 group-hover:text-neon-soft transition-colors">{episode.title}</span>
+        </span>
+      </a>
+    ) : (
+      <p class="flex items-center justify-center min-h-28 p-4 rounded-[18px] border border-dashed border-line font-mono text-sm text-dim">
+        {label === '다음' ? '다음 에피소드 녹음 중…' : '첫 에피소드입니다'}
+      </p>
+    ),
+  )}
+</nav>

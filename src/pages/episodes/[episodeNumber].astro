@@ -9,21 +9,25 @@ import Footer from '../../components/Footer.astro';
 import CoverFallback from '../../components/CoverFallback.astro';
 import EpisodePlayer from '../../components/EpisodePlayer.astro';
 import EpisodeChapters from '../../components/EpisodeChapters.astro';
+import EpisodeNav from '../../components/EpisodeNav.astro';
 import Giscus from '../../components/Giscus.astro';
 import type { Episode } from '../../lib/types';
 export async function getStaticPaths() {
-  const { meta, episodes } = await getPodcastData();
-  return episodes.map((episode) => ({
+  const { episodes } = await getPodcastData();
+  // 피드는 최신순이라 목록의 다음 항목이 이전 에피소드다
+  return episodes.map((episode, index) => ({
     params: { episodeNumber: String(episode.episodeNumber) },
-    props: { episode },
+    props: { episode, previous: episodes[index + 1], next: episodes[index - 1] },
   }));
 }
 
 interface Props {
   episode: Episode;
+  previous?: Episode;
+  next?: Episode;
 }
 
-const { episode } = Astro.props;
+const { episode, previous, next } = Astro.props;
 
 const siteUrl = 'https://dalejule.com';
 const canonicalUrl = `${siteUrl}/episodes/${episode.episodeNumber}`;
@@ -143,6 +147,8 @@ const formattedDate = formatDate(episode.publishDate);
           </div>
         )}
       </div>
+
+      <EpisodeNav previous={previous} next={next} />
 
       <Giscus />
     </div>
