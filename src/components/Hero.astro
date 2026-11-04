@@ -9,7 +9,6 @@ interface Props {
 }
 
 const { episode } = Astro.props;
-const episodeUrl = `/episodes/${episode.episodeNumber}`;
 ---
 
 <section aria-labelledby="latest-title" class="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 sm:pt-18 sm:pb-22 flex flex-wrap items-center gap-12 lg:gap-14">
@@ -27,23 +26,12 @@ const episodeUrl = `/episodes/${episode.episodeNumber}`;
     </h1>
     <p class="text-lg leading-relaxed text-mist max-w-xl line-clamp-3">{episode.description}</p>
     <div class="flex flex-wrap gap-3 mt-2">
-      {episode.listenUrl && (
-        <a
-          href={episode.listenUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2.5 h-13 px-6.5 rounded-full bg-neon text-on-neon text-[17px] font-extrabold shadow-[0_0_32px_rgba(255,122,26,0.45)] hover:bg-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
-        >
-          <svg class="size-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
-          지금 듣기
-        </a>
-      )}
       <a
-        href={episodeUrl}
-        class="inline-flex items-center gap-2 h-13 px-6 rounded-full border border-line text-[17px] font-bold hover:border-neon-soft hover:text-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
+        href={`/episodes/${episode.episodeNumber}`}
+        class="inline-flex items-center gap-2.5 h-13 px-6.5 rounded-full bg-neon text-on-neon text-[17px] font-extrabold shadow-[0_0_32px_rgba(255,122,26,0.45)] hover:bg-neon-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
       >
-        쇼노트 보기
-        <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        <svg class="size-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
+        지금 듣기
       </a>
     </div>
   </div>

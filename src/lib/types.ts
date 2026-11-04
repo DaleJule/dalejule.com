@@ -23,6 +23,5 @@ export interface Episode {
   duration: string;
   imageUrl: string;
   audioUrl: string;
-  listenUrl: string;
   chapters: Chapter[];
 }

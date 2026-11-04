@@ -188,7 +188,6 @@ async function fetchPodcastData(): Promise<PodcastData> {
       duration: formatDuration(item?.['itunes:duration'] || ''),
       imageUrl: episodeImageUrl === meta.imageUrl ? '' : episodeImageUrl,
       audioUrl: item?.enclosure?.['@_url'] || '',
-      listenUrl: toText(item?.link) || item?.enclosure?.['@_url'] || '',
       chapters,
     };
   });

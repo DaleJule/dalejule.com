@@ -54,17 +54,13 @@ const archive = episodes.slice(RECENT_COUNT);
           </a>
           <span class="font-mono text-[13px] text-dim">{formatDate(episode.publishDate)}</span>
           <span class="w-18 text-right font-mono text-[13px] text-dim">{episode.duration}</span>
-          {episode.listenUrl && (
-            <a
-              href={episode.listenUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`EP.${episode.episodeNumber} ${episode.title} 듣기`}
-              class="size-11 shrink-0 flex items-center justify-center rounded-full border border-line text-neon-soft hover:bg-neon hover:text-on-neon hover:border-neon transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
-            >
-              <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
-            </a>
-          )}
+          <a
+            href={`/episodes/${episode.episodeNumber}`}
+            aria-label={`EP.${episode.episodeNumber} ${episode.title} 듣기`}
+            class="size-11 shrink-0 flex items-center justify-center rounded-full border border-line text-neon-soft hover:bg-neon hover:text-on-neon hover:border-neon transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+          >
+            <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" /></svg>
+          </a>
         </li>
       ))}
     </ol>
