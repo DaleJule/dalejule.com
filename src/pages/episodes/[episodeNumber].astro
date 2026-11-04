@@ -56,8 +56,8 @@ const formattedDate = formatDate(episode.publishDate);
   <Header />
   <main id="main-content">
     <section aria-labelledby="episode-title" class="relative overflow-hidden border-b border-line-soft">
+      <!-- 커버를 흐리게 깔아 에피소드마다 다른 분위기를 낸다. 아래 커버와 같은 변환이라 추가 다운로드가 없다 -->
       {episode.imageUrl && (
-        <!-- 커버를 흐리게 깔아 에피소드마다 다른 분위기를 낸다. 아래 커버와 같은 변환이라 추가 다운로드가 없다 -->
         <Image
           src={episode.imageUrl}
           alt=""
@@ -82,8 +82,8 @@ const formattedDate = formatDate(episode.publishDate);
 
         <div class="flex flex-wrap items-end gap-8 sm:gap-12">
           <div class="w-48 sm:w-80 max-w-full shrink-0 rounded-3xl border border-line overflow-hidden shadow-[0_0_60px_rgba(255,122,26,0.3),0_30px_80px_rgba(0,0,0,0.6)]">
+            <!-- fetchpriority="high": above-fold critical image -->
             {episode.imageUrl ? (
-              <!-- fetchpriority="high": above-fold critical image -->
               <Image
                 src={episode.imageUrl}
                 alt=""
