@@ -40,8 +40,26 @@ function toText(val: unknown): string {
   return String(val);
 }
 
+const ENTITIES: Record<string, string> = { '&amp;': '&', '&quot;': '"', '&#39;': "'", '&lt;': '<', '&gt;': '>' };
+
+// 태그를 지우고 HTML 엔티티를 풀어 일반 텍스트로 만든다
 function stripHtml(html: unknown): string {
-  return toText(html).replace(/<[^>]*>/g, '').trim();
+  return toText(html)
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&(?:amp|quot|#39|lt|gt);/g, (entity) => ENTITIES[entity])
+    .trim();
+}
+
+// 홈 카드와 메타 태그에 쓰는 요약. 첫 제목(##)이나 목록(-)이 나오기 전의 소개 문단만 쓴다
+function summarize(html: string): string {
+  const intro: string[] = [];
+  for (const block of html.split(/<\/p>/i)) {
+    const text = stripHtml(block);
+    if (/^(#{2,3} |- )/.test(text)) break;
+    if (text) intro.push(text);
+  }
+  return intro.join(' ');
 }
 
 // 이미 있는 <a>는 그대로 두고, 마크다운 링크 [텍스트](URL)와 태그 밖에 그냥 적힌 URL을 링크로 바꾼다
@@ -189,7 +207,7 @@ async function fetchPodcastData(): Promise<PodcastData> {
       guid: toText(item?.guid) || String(index),
       episodeNumber: total - index,
       title,
-      description: stripHtml(rawDesc),
+      description: summarize(notesHtml),
       descriptionHtml: processDescriptionHtml(notesHtml),
       publishDate: toText(item?.pubDate),
       duration: formatDuration(item?.['itunes:duration'] || ''),
