@@ -44,11 +44,17 @@ function stripHtml(html: unknown): string {
   return toText(html).replace(/<[^>]*>/g, '').trim();
 }
 
-function autoLink(text: string): string {
-  return text.replace(
-    /(https?:\/\/[^\s<>"]+)/g,
-    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-  );
+// 이미 있는 <a>는 그대로 두고, 마크다운 링크 [텍스트](URL)와 태그 밖에 그냥 적힌 URL을 링크로 바꾼다
+// 텍스트 안에 [스웨덴 게임 개발자]처럼 대괄호가 한 번 더 들어간 경우도 있다
+const LINK_PATTERN =
+  /(<a\b[^>]*>.*?<\/a>)|\[((?:[^[\]]|\[[^\]]*\])+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"]+)(?![^<]*>)/gi;
+
+function autoLink(html: string): string {
+  return html.replace(LINK_PATTERN, (match, anchor, label, markdownUrl, url) => {
+    if (anchor) return match;
+    const href = markdownUrl ?? url;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${label ?? url}</a>`;
+  });
 }
 
 function processDescriptionHtml(raw: unknown): string {
@@ -86,11 +92,8 @@ function processDescriptionHtml(raw: unknown): string {
       listItems.push(autoLink(textOnly.slice(2)));
     } else {
       flushList();
-      // Preserve inline HTML (bold, etc.) but auto-link plain URLs not already in href
-      const linkedBlock = block.replace(/(https?:\/\/[^\s<>"]+)(?![^<]*>)/g, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-      });
-      parts.push(`<p>${linkedBlock}</p>`);
+      // 문단은 굵은 글씨 같은 인라인 HTML을 살린다
+      parts.push(`<p>${autoLink(block)}</p>`);
     }
   }
   flushList();
