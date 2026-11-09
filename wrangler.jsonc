@@ -1,4 +1,12 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dalejule",
-  "pages_build_output_dir": "./dist"
+  "account_id": "86aa227176a624680f7d34e691472576",
+  "compatibility_date": "2026-11-08",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "dalejule.com", "custom_domain": true, "previews_enabled": true }],
+  "previews": {}
 }

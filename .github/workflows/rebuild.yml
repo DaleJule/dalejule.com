@@ -9,13 +9,17 @@ jobs:
   trigger-rebuild:
     runs-on: ubuntu-latest
     permissions:
-      checks: read
+      actions: write
     steps:
       - name: Check for a new episode
         id: check
-        if: github.event_name == 'schedule'
         run: |
-          count=$(curl -fsSL "$RSS_URL" | grep -o '<item>' | wc -l)
+          rss=$(curl -fsSL "$RSS_URL")
+          count=$(grep -o '<item>' <<< "$rss" | wc -l)
+          # 첫 번째 제목은 채널 제목이고 두 번째가 최신 에피소드 제목이다
+          title=$(grep -oP '<title><!\[CDATA\[\K.*?(?=\]\]>)' <<< "$rss" | sed -n 2p)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
           status=$(curl -s -o /dev/null -w '%{http_code}' -I "https://dalejule.com/episodes/$count/")
           echo "RSS has $count episodes; /episodes/$count/ returned $status"
           if [ "$status" = "404" ]; then
@@ -24,24 +28,46 @@ jobs:
         env:
           RSS_URL: https://anchor.fm/s/9cd202e8/podcast/rss
 
+      # 에피소드는 YouTube에 늦게 올라올 수 있으므로, 최신 에피소드 영상이 생기면 재생 목록 링크를 영상 링크로 바꾸도록 다시 배포한다
+      - name: Check for a new YouTube video
+        id: youtube
+        continue-on-error: true
+        run: |
+          video_id=$(curl -fsSL "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=$PLAYLIST_ID&key=$YOUTUBE_API_KEY" \
+            | jq -r --arg title "$TITLE" 'first(.items[] | select(.snippet.title == $title) | .snippet.resourceId.videoId) // empty')
+          if [ -z "$video_id" ]; then
+            echo "EP.$COUNT is not on YouTube yet"
+            exit 0
+          fi
+          # 쇼노트에 다른 영상 링크가 있을 수 있으므로 이 에피소드 영상의 URL로 확인한다
+          if curl -fsSL "https://dalejule.com/episodes/$COUNT/" | grep -qF "youtube.com/watch?v=$video_id"; then
+            echo "EP.$COUNT already links to https://www.youtube.com/watch?v=$video_id"
+          else
+            echo "EP.$COUNT is on YouTube ($video_id) but the site still links to the playlist"
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          COUNT: ${{ steps.check.outputs.count }}
+          TITLE: ${{ steps.check.outputs.title }}
+          PLAYLIST_ID: PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+
       # 피드 CDN은 쿼리 문자열과 no-cache를 무시하므로 오래된 피드로 실패한 배포는 다시 시도하는 수밖에 없다
       - name: Check whether the last deploy failed
         id: deploy
-        if: github.event_name == 'schedule'
         run: |
-          # 이 API는 이름별로 가장 최근 실행만 돌려준다(filter=latest)
-          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?check_name=Cloudflare%20Pages" \
-            --jq '.check_runs[0].conclusion')
-          echo "Last Cloudflare Pages deploy of $GITHUB_SHA: $conclusion"
+          conclusion=$(gh run list --workflow deploy.yml --branch main --limit 1 --json conclusion --jq '.[0].conclusion')
+          echo "Last deploy: $conclusion"
           if [ "$conclusion" = "failure" ]; then
             echo "failed=true" >> "$GITHUB_OUTPUT"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
-      - name: Trigger Cloudflare Pages deploy hook
-        if: github.event_name == 'workflow_dispatch' || steps.check.outputs.new == 'true' || steps.deploy.outputs.failed == 'true'
-        run: |
-          curl -fsSL -X POST "$DEPLOY_HOOK_URL"
+      - name: Deploy
+        if: steps.check.outputs.new == 'true' || steps.youtube.outputs.new == 'true' || steps.deploy.outputs.failed == 'true'
+        run: gh workflow run deploy.yml --ref main
         env:
-          DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
