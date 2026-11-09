@@ -138,8 +138,9 @@ export function getPodcastData(): Promise<PodcastData> {
 // 이미 공개된 에피소드가 피드에 없으면 빌드를 실패시켜 마지막 정상 배포를 유지한다
 async function assertFeedIsCurrent(episodeCount: number): Promise<void> {
   const nextEpisodeUrl = `${SITE_URL}/episodes/${episodeCount + 1}/`;
-  const response = await fetch(nextEpisodeUrl, { method: 'HEAD' });
-  if (response.ok) {
+  // 사이트에 접속할 수 없으면 공개된 에피소드도 없으므로 그대로 빌드한다
+  const response = await fetch(nextEpisodeUrl, { method: 'HEAD' }).catch(() => null);
+  if (response?.ok) {
     throw new Error(
       `RSS feed has ${episodeCount} episodes but ${nextEpisodeUrl} is already live. Refusing to build from a stale feed.`
     );
