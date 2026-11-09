@@ -1,6 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import type { PodcastMeta, Episode, Chapter } from './types';
 import { toSeconds } from './format';
+import { fetchYouTubeVideoUrls } from './youtube';
 
 export const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
 const SITE_URL = 'https://dalejule.com';
@@ -171,23 +172,26 @@ async function fetchPodcastData(): Promise<PodcastData> {
 
   const items: any[] = Array.isArray(channel.item) ? channel.item : [channel.item];
   const total = items.length;
+  const youtubeVideoUrls = await fetchYouTubeVideoUrls();
 
   const episodes: Episode[] = items.map((item: any, index: number) => {
     const rawDesc = item?.['itunes:summary'] || item?.description || '';
     const { chapters, html: notesHtml } = extractChapters(rawDesc);
     // 전용 커버가 없는 에피소드는 피드에 쇼 아트가 들어 있으므로 커버 없음으로 취급한다
     const episodeImageUrl = toText(item?.['itunes:image']?.['@_href']);
+    const title = toText(item?.title);
 
     return {
       guid: toText(item?.guid) || String(index),
       episodeNumber: total - index,
-      title: toText(item?.title),
+      title,
       description: stripHtml(rawDesc),
       descriptionHtml: processDescriptionHtml(notesHtml),
       publishDate: toText(item?.pubDate),
       duration: formatDuration(item?.['itunes:duration'] || ''),
       imageUrl: episodeImageUrl === meta.imageUrl ? '' : episodeImageUrl,
       audioUrl: item?.enclosure?.['@_url'] || '',
+      youtubeUrl: youtubeVideoUrls.get(title) ?? '',
       chapters,
     };
   });

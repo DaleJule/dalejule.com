@@ -23,5 +23,6 @@ export interface Episode {
   duration: string;
   imageUrl: string;
   audioUrl: string;
+  youtubeUrl: string;
   chapters: Chapter[];
 }
