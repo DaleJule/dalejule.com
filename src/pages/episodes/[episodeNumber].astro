@@ -56,13 +56,13 @@ const formattedDate = formatDate(episode.publishDate);
   <Header />
   <main id="main-content">
     <section aria-labelledby="episode-title" class="relative overflow-hidden border-b border-line-soft">
-      <!-- 커버를 흐리게 깔아 에피소드마다 다른 분위기를 낸다. 아래 커버와 같은 변환이라 추가 다운로드가 없다 -->
+      <!-- 커버를 흐리게 깔아 에피소드마다 다른 분위기를 낸다. 크게 흐리므로 작은 이미지로 충분하다 -->
       {episode.imageUrl && (
         <Image
           src={episode.imageUrl}
           alt=""
-          width={640}
-          height={640}
+          width={96}
+          height={96}
           format="webp"
           aria-hidden="true"
           class="absolute -inset-20 w-[calc(100%+10rem)] h-[calc(100%+10rem)] max-w-none object-cover blur-[70px] saturate-[1.3] opacity-35"
@@ -81,14 +81,17 @@ const formattedDate = formatDate(episode.publishDate);
         </a>
 
         <div class="flex flex-wrap items-end gap-8 sm:gap-12">
-          <div class="w-48 sm:w-80 max-w-full shrink-0 rounded-3xl border border-line overflow-hidden shadow-[0_0_60px_rgba(255,122,26,0.3),0_30px_80px_rgba(0,0,0,0.6)]">
+          <div class="w-full sm:w-80 shrink-0 rounded-3xl border border-line overflow-hidden shadow-[0_0_60px_rgba(255,122,26,0.3),0_30px_80px_rgba(0,0,0,0.6)]">
             <!-- fetchpriority="high": above-fold critical image -->
+            <!-- 모바일에서는 좌우 여백(px-4)을 뺀 화면 폭을 채운다 -->
             {episode.imageUrl ? (
               <Image
                 src={episode.imageUrl}
                 alt=""
-                width={640}
-                height={640}
+                width={1080}
+                height={1080}
+                widths={[320, 640, 1080]}
+                sizes="(min-width: 640px) 320px, calc(100vw - 2rem)"
                 format="webp"
                 loading="eager"
                 fetchpriority="high"
