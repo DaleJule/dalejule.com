@@ -83,7 +83,7 @@ const formattedDate = formatDate(episode.publishDate);
         <div class="flex flex-wrap items-end gap-8 sm:gap-12">
           <div class="w-full sm:w-80 shrink-0 rounded-3xl border border-line overflow-hidden shadow-[0_0_60px_rgba(255,122,26,0.3),0_30px_80px_rgba(0,0,0,0.6)]">
             <!-- fetchpriority="high": above-fold critical image -->
-            <!-- 모바일에서는 좌우 여백(px-4)을 뺀 화면 폭을 채운다 -->
+            <!-- 모바일에서는 좌우 여백(px-4)을 뺀 화면 폭을 채운다. 대체 커버는 정사각형이면 빈 공간이 커서 16:9로 줄인다 -->
             {episode.imageUrl ? (
               <Image
                 src={episode.imageUrl}
@@ -98,7 +98,7 @@ const formattedDate = formatDate(episode.publishDate);
                 class="block w-full aspect-square object-cover"
               />
             ) : (
-              <CoverFallback episodeNumber={episode.episodeNumber} />
+              <CoverFallback episodeNumber={episode.episodeNumber} class="aspect-video sm:aspect-square" />
             )}
           </div>
 
