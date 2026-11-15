@@ -31,3 +31,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: bun
+          # Worker 비밀값은 GitHub 저장소 비밀값을 기준으로 배포 전에 올린다 (wrangler.jsonc의 secrets.required)
+          secrets: |
+            YOUTUBE_API_KEY
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
