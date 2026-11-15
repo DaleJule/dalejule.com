@@ -1,8 +1,7 @@
 name: Rebuild site
 
+# GitHub 예약 실행은 몇 시간씩 밀리므로, Cloudflare Worker의 Cron Trigger(worker/index.ts)가 10분마다 실행한다
 on:
-  schedule:
-    - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
