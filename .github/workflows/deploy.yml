@@ -25,8 +25,6 @@ jobs:
       - run: bun install --frozen-lockfile
 
       - run: bun run build
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v4

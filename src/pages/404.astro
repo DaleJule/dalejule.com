@@ -2,6 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+// 없는 에피소드 번호도 이 페이지로 보내므로(Astro.rewrite) 함께 요청 시 렌더링한다
+export const prerender = false;
 ---
 
 <Layout title="페이지를 찾을 수 없습니다 — 달레줄레 팟캐스트">

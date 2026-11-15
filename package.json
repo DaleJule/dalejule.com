@@ -8,6 +8,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.4.8",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.12",
     "fast-xml-parser": "^5.11.1",
@@ -18,5 +19,8 @@
     "sharp": "^0.35.4",
     "typescript": "^5.9.3",
     "wrangler": "^4.158.0"
+  },
+  "overrides": {
+    "@emnapi/runtime": "^1.11.3"
   }
 }
