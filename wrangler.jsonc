@@ -3,10 +3,20 @@
   "name": "dalejule",
   "account_id": "86aa227176a624680f7d34e691472576",
   "compatibility_date": "2026-11-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./src/worker.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS"
   },
+  "kv_namespaces": [{ "binding": "PODCAST", "id": "6dce692cdadf469984bdf9e2d352a12a" }],
+  "secrets": { "required": ["YOUTUBE_API_KEY"] },
+  // 피드를 10분마다 다시 받아 KV에 저장한다 (src/worker.ts)
+  "triggers": { "crons": ["*/10 * * * *"] },
   "routes": [{ "pattern": "dalejule.com", "custom_domain": true, "previews_enabled": true }],
-  "previews": {}
+  // 미리보기는 YouTube 키 없이 피드를 받으므로 운영 KV를 덮어쓰지 않게 따로 둔다
+  "previews": {
+    "kv_namespaces": [{ "binding": "PODCAST", "id": "fa4c5bd837154bd78b829a486c070daa" }]
+  },
+  "observability": { "enabled": true, "traces": { "enabled": true } }
 }

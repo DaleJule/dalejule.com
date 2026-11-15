@@ -4,7 +4,6 @@ import { toSeconds } from './format';
 import { fetchYouTubeVideoUrls } from './youtube';
 
 export const RSS_URL = 'https://anchor.fm/s/9cd202e8/podcast/rss';
-const SITE_URL = 'https://dalejule.com';
 
 function formatDuration(duration: string | number): string {
   if (!duration) return '';
@@ -145,30 +144,9 @@ function extractChapters(raw: unknown): { chapters: Chapter[]; html: string } {
   return { chapters, html };
 }
 
-type PodcastData = { meta: PodcastMeta; episodes: Episode[] };
+export type PodcastData = { meta: PodcastMeta; episodes: Episode[] };
 
-// 빌드 중 페이지마다 RSS를 다시 받으면 서로 다른 스냅샷을 보게 되므로 한 번만 받는다
-let podcastData: Promise<PodcastData> | null = null;
-
-export function getPodcastData(): Promise<PodcastData> {
-  podcastData ??= fetchPodcastData();
-  return podcastData;
-}
-
-// 피드 CDN은 엣지마다 최대 7일간 캐시되어 최신 에피소드가 빠진 스냅샷을 줄 때가 있다.
-// 이미 공개된 에피소드가 피드에 없으면 빌드를 실패시켜 마지막 정상 배포를 유지한다
-async function assertFeedIsCurrent(episodeCount: number): Promise<void> {
-  const nextEpisodeUrl = `${SITE_URL}/episodes/${episodeCount + 1}/`;
-  // 사이트에 접속할 수 없으면 공개된 에피소드도 없으므로 그대로 빌드한다
-  const response = await fetch(nextEpisodeUrl, { method: 'HEAD' }).catch(() => null);
-  if (response?.ok) {
-    throw new Error(
-      `RSS feed has ${episodeCount} episodes but ${nextEpisodeUrl} is already live. Refusing to build from a stale feed.`
-    );
-  }
-}
-
-async function fetchPodcastData(): Promise<PodcastData> {
+export async function fetchPodcastData(youtubeApiKey: string | undefined): Promise<PodcastData> {
   const response = await fetch(RSS_URL);
   if (!response.ok) {
     throw new Error(`Failed to fetch RSS feed: ${response.status}`);
@@ -194,7 +172,7 @@ async function fetchPodcastData(): Promise<PodcastData> {
 
   const items: any[] = Array.isArray(channel.item) ? channel.item : [channel.item];
   const total = items.length;
-  const youtubeVideoUrls = await fetchYouTubeVideoUrls();
+  const youtubeVideoUrls = await fetchYouTubeVideoUrls(youtubeApiKey);
 
   const episodes: Episode[] = items.map((item: any, index: number) => {
     const rawDesc = item?.['itunes:summary'] || item?.description || '';
@@ -217,8 +195,6 @@ async function fetchPodcastData(): Promise<PodcastData> {
       chapters,
     };
   });
-
-  await assertFeedIsCurrent(episodes.length);
 
   return { meta, episodes };
 }

@@ -1,5 +1,3 @@
-import { YOUTUBE_API_KEY } from 'astro:env/server';
-
 const PLAYLIST_ID = 'PLapoeRAdKitf4M7HOGIDzwNtsfo6ZqO8W';
 export const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${PLAYLIST_ID}`;
 
@@ -9,9 +7,9 @@ type PlaylistItemsResponse = {
 };
 
 // 재생 목록의 영상 제목이 RSS 에피소드 제목과 같으므로 제목을 키로 영상 URL을 돌려준다
-export async function fetchYouTubeVideoUrls(): Promise<Map<string, string>> {
+export async function fetchYouTubeVideoUrls(apiKey: string | undefined): Promise<Map<string, string>> {
   const urls = new Map<string, string>();
-  if (!YOUTUBE_API_KEY) {
+  if (!apiKey) {
     console.warn('YOUTUBE_API_KEY is not set. Episodes will link to the YouTube playlist.');
     return urls;
   }
@@ -22,7 +20,7 @@ export async function fetchYouTubeVideoUrls(): Promise<Map<string, string>> {
       part: 'snippet',
       playlistId: PLAYLIST_ID,
       maxResults: '50',
-      key: YOUTUBE_API_KEY,
+      key: apiKey,
     });
     if (pageToken) params.set('pageToken', pageToken);
 
