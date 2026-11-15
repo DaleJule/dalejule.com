@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^5.18.2",
+    "astro": "^7.4.12",
     "fast-xml-parser": "^5.11.1",
     "tailwindcss": "^4.3.3"
   },
