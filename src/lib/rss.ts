@@ -147,7 +147,9 @@ function extractChapters(raw: unknown): { chapters: Chapter[]; html: string } {
 export type PodcastData = { meta: PodcastMeta; episodes: Episode[] };
 
 export async function fetchPodcastData(youtubeApiKey: string | undefined): Promise<PodcastData> {
-  const response = await fetch(RSS_URL);
+  // 피드 CDN은 Accept-Encoding별로 최대 7일 묵은 사본을 준다. Authorization 헤더가 붙은 요청은
+  // 캐시하지 않고 원본을 주므로, 값은 의미 없지만 헤더를 붙여 항상 최신 피드를 받는다
+  const response = await fetch(RSS_URL, { headers: { Authorization: 'Bearer none' } });
   if (!response.ok) {
     throw new Error(`Failed to fetch RSS feed: ${response.status}`);
   }
